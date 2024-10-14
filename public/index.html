@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- This is an SEO Change -->
+    <meta name="description" content="Manage your personal budget, track expenses, receive alerts, and stay financially healthy with our personal-budget management app.">
+    
+    <!-- This is an SEO Change -->
+    <meta name="keywords" content="budget management, expense tracking, personal finance, budget alerts, free app">
+    
+    <title>Personal Budget - Track Expenses, Stay on Budget, Get Alerts</title>
+
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+    <div class="menu" aria-label="Main Navigation">
+        <ul>
+            <li><a href="/">Homepage</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="https://google.com">Google</a></li>
+        </ul>
+    </div>
+
+    <div class="hero">
+        <h1>Personal Budget</h1>
+        <h2>A personal-budget management app</h2>
+    </div>
+
+    <div class="container center">
+        <div class="page-area">
+            <article class="text-box" aria-labelledby="track-header">
+                <h1 id="track-header">Stay on track</h1>
+                <p>
+                    Do you know where you are spending your money? If you really stop to track it down,
+                    you would get surprised! Proper budget management depends on real data... and this
+                    app will help you with that!
+                </p>
+            </article>
+
+            <section class="text-box" aria-labelledby="alerts-header">
+                <h1 id="alerts-header">Alerts</h1>
+                <p>
+                    What if your clothing budget ended? You will get an alert. The goal is to never go over the budget.
+                </p>
+            </section>
+
+            <aside class="text-box" aria-labelledby="results-header">
+                <h1 id="results-header">Results</h1>
+                <p>
+                    People who stick to a financial plan, budgeting every expense, get out of debt faster!
+                    Also, they live happier lives... since they expend without guilt or fear... 
+                    because they know it is all good and accounted for.
+                </p>
+            </aside>
+
+            <div class="charts">
+                <article class="text-box d3js" id="d3jsChart">
+                    <h1>D3js Chart</h1>
+                </article>
+                
+                <article class="text-box">
+                    <h1>Pie Chart</h1>
+                    <p>
+                        <canvas id="myChart" min-width="400" min-height="400"></canvas>
+                    </p>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bottom">
+        <div class="center">
+            <address>All rights reserved &copy; Harsha Mulge</address>
+        </div>
+    </footer>
+
+    <!-- Include necessary libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js" integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+    <script>
+        var dataSource = {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: [
+                    '#FF5733', '#33FF57', '#3357FF', '#FF33A6', '#33FFF3', 
+                    '#ff6383', '#FFDB33', '#fd6b19', '#f6b26f'
+                ],
+            }],
+            myBudget: []
+        };
+
+        // Function to create the Pie Chart using Chart.js
+        function createChart() {
+            var ctx = document.getElementById("myChart").getContext("2d");
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: dataSource
+            });
+        }
+
+        // Function to populate the D3.js chart
+        function populateD3jsChart() {
+            var width = 450, height = 450, margin = 40;
+            var radius = Math.min(width, height) / 2 - margin;
+
+            var svg = d3.select("#d3jsChart")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            var data = dataSource.myBudget;
+            var color = d3.scaleOrdinal().range(d3.schemeDark2);
+            var pie = d3.pie().sort(null).value(function(d) { return d.value.budget; });
+            var data_ready = pie(d3.entries(data));
+
+            var arc = d3.arc().innerRadius(radius * 0.45).outerRadius(radius * 0.8);
+            var outerArc = d3.arc().innerRadius(radius * 0.9).outerRadius(radius * 0.9);
+
+            svg.selectAll('allSlices')
+                .data(data_ready)
+                .enter()
+                .append('path')
+                .attr('d', arc)
+                .attr('fill', function(d){ return color(d.data.value.title); })
+                .attr("stroke", "white")
+                .style("stroke-width", "2px")
+                .style("opacity", 0.7);
+
+            svg.selectAll('allLabels')
+                .data(data_ready)
+                .enter()
+                .append('text')
+                .text(function(d) { return d.data.value.title; })
+                .attr('transform', function(d) {
+                    var pos = outerArc.centroid(d);
+                    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+                    pos[0] = radius * 0.8 * (midangle < Math.PI ? 1 : -1); // Move labels closer
+                    return 'translate(' + pos + ')';
+                })
+                .style('text-anchor', function(d) {
+                    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+                    return (midangle < Math.PI ? 'start' : 'end');
+                });
+        }
+
+        // Fetch budget data and populate charts
+        function getBudget(){
+            axios.get('/budget')
+            .then(function (res) {
+                console.log("Response data:", res.data); // Check response structure
+
+                // Assuming res.data is an array of budget items
+                dataSource.labels = [];
+                dataSource.datasets[0].data = [];
+                dataSource.myBudget = [];
+
+                for (var i = 0; i < res.data.length; i++) {
+                    dataSource.datasets[0].data.push(res.data[i].budget);  // Add each budget
+                    dataSource.labels.push(res.data[i].title);  // Add each title
+                    dataSource.myBudget.push({
+                        "title": res.data[i].title,
+                        "budget": res.data[i].budget
+                    });
+                }
+
+                console.log("DataSource for chart:", dataSource);  // Check if multiple items exist
+                createChart();
+                populateD3jsChart();
+            })
+            .catch(function (error) {
+                console.error('Error fetching budget data:', error);
+            });
+        }
+
+        getBudget();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+    "myBudget": [
+    {
+    "title" : "Eat out",
+    "budget" : "30"
+    },
+    {"title" : "Rent",
+    "budget" : "350"},
+    {"title" : "Groceries",
+    "budget" : "90"},
+    {
+        "title" : "health care",
+        "budget" : "120"
+    },
+    {
+        "title" : "debt payments",
+        "budget" : "40"
+    },
+    {
+        "title" : "internet bill",
+        "budget" : "110"
+    },
+    {
+        "title" : "education",
+        "budget": "150"
+    },
+    {
+        "title" : "gym membership",
+        "budget" : "10"
+    }
+  
+    
+  ]
+    
+  }
